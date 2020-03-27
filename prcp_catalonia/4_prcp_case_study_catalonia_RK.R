@@ -1690,7 +1690,7 @@ data <- as.data.frame(cbind(STRK_5f_obs, STRK_5f_pred))
 p1 <- ggplot(data, aes(x=STRK_5f_pred, y=STRK_5f_obs) ) +
   geom_hex(bins = 50, aes(fill = stat(cut(log(count), breaks = log(c(0, 5, 10, 50, 100, 500, 35000, Inf)), labels = F, right = T, include.lowest = T)))) +
   scale_fill_gradientn(colours = my_colors, name = 'Count', labels = c('5', '10', '50', '100', '500', '35000', '70000+'))+
-  theme(plot.title = element_text(hjust = 8),
+  theme(plot.title = element_text(hjust = 0.5, face="bold"),
         axis.text = element_text(size = 8),
         axis.title = element_text(size = 8),
         text = element_text(size = 8),
@@ -1710,7 +1710,7 @@ data <- as.data.frame(cbind(rf_5f_obs, rf_5f_pred))
 p2 <- ggplot(data, aes(x=rf_5f_pred, y=rf_5f_obs) ) +
   geom_hex(bins = 50, aes(fill = stat(cut(log(count), breaks = log(c(0, 5, 10, 50, 100, 500, 35000, Inf)), labels = F, right = T, include.lowest = T)))) +
   scale_fill_gradientn(colours = my_colors, name = 'Count', labels = c('5', '10', '50', '100', '500', '35000', '70000+'))+
-  theme(plot.title = element_text(hjust = 8),
+  theme(plot.title = element_text(hjust = 0.5, face="bold"),
         axis.text = element_text(size = 8),
         axis.title = element_text(size = 8),
         text = element_text(size = 8),
@@ -1729,7 +1729,7 @@ data <- as.data.frame(cbind(rfsi_5f_obs, rfsi_5f_pred))
 p3 <- ggplot(data, aes(x=rfsi_5f_pred, y=rfsi_5f_obs) ) +
   geom_hex(bins = 50, aes(fill = stat(cut(log(count), breaks = log(c(0, 5, 10, 50, 100, 500, 35000, Inf)), labels = F, right = T, include.lowest = T)))) +
   scale_fill_gradientn(colours = my_colors, name = 'Count', labels = c('5', '10', '50', '100', '500', '35000', '70000+'))+
-  theme(plot.title = element_text(hjust = 8),
+  theme(plot.title = element_text(hjust = 0.5, face="bold"),
         axis.text = element_text(size = 8),
         axis.title = element_text(size = 8),
         text = element_text(size = 8),
@@ -1748,7 +1748,7 @@ data <- as.data.frame(cbind(rfsp_5f_obs, rfsp_5f_pred))
 p4 <- ggplot(data, aes(x=rfsp_5f_pred, y=rfsp_5f_obs) ) +
   geom_hex(bins = 50, aes(fill = stat(cut(log(count), breaks = log(c(0, 5, 10, 50, 100, 500, 35000, Inf)), labels = F, right = T, include.lowest = T)))) +
   scale_fill_gradientn(colours = my_colors, name = 'Count', labels = c('5', '10', '50', '100', '500', '35000', '70000+'))+
-  theme(plot.title = element_text(hjust = 8),
+  theme(plot.title = element_text(hjust = 0.5, face="bold"),
         axis.text = element_text(size = 8),
         axis.title = element_text(size = 8),
         text = element_text(size = 8),
