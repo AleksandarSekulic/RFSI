@@ -17,7 +17,7 @@ The scripts and data for the synthetic case study are in the [simulation](simula
 - [boxplots.R](simulation/boxplots.R) - a script for making the boxplots from accuracy metrics (accuracy_results.rda),
 - [simulation.R](simulation/simulation.R) - a script for simulation, making the models and prediction maps, and calculation of the accuracy metrics for OK, RFSI, RFsp, IDW, NN, and TS.
 
-### Precipitation case study (prcp_catalonia)
+### Precipitation case study
 
 RFSI is applied to a daily precipitation dataset for Catalonia for the years 2016–2018. Its performance is compared to space-time regression kriging (STRK), RFsp, and regular RF using nested leave-location out 5-fold cross-validation (LLOCV).
 
