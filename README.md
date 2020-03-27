@@ -37,6 +37,7 @@ The scripts and data for the precipitation case study are in the *prcp_catalonia
 - *4_prcp_case_study_catalonia_RK.R* - a script for making the STRK, RF, RFsp, and RFSI models and LLOCV
 - *5_prcp_prediction.R* - a script for making prediction and interquartile range (IQR) maps from STRK, RF, RFsp, and RFSI models
 - *stratfolds.R* - a script for creation of spatially stratified folds
+
 *Note that the number in the script name refers to the order in which the scripts should be run. Also, scripts 4 and 5 cam be run with the data in folder temp_data.*
 
 ## How to make an RFSI model
