@@ -14,31 +14,31 @@ RFSI is evaluated on two case studies, synthetic and precipitation.
 
 For this case study, multiple realisations of a spatially autocorrelated random field are simulated using a known semivariogram. The performance of RFSi is compared with the performance of ordinary kriging (OK), RFsp (Hengl et al. 2018), Inverse distance Weighting (IDW), nearest neighbour (NN), and trend surface (TS). 
 
-The scripts and data for the synthetic case study are in the *simulation* folder, and are the following:
-- *accuracy_results.rda* - R data frame with accuracy metrics from evaluation
-- *boxplots.R* - a script for making the boxplots from accuracy metrics (accuracy_results.rda)
-- *simulation.R* - a script for simulation, making the models and prediction maps, and calculation of the accuracy metrics for OK, RFSI, RFsp, IDW, NN, and TS
+The scripts and data for the synthetic case study are in the [simulation](simulation/) folder, and are the following:
+- [accuracy_results.rda](simulation/accuracy_results.rda) - R data frame with accuracy metrics from evaluation
+- [boxplots.R](simulation/boxplots.R) - a script for making the boxplots from accuracy metrics (accuracy_results.rda)
+- [simulation.R](simulation/simulation.R) - a script for simulation, making the models and prediction maps, and calculation of the accuracy metrics for OK, RFSI, RFsp, IDW, NN, and TS
 
 ### Precipitation case study (prcp_catalonia)
 
 RFSI is applied to a daily precipitation dataset for Catalonia for the years 2016–2018. Its performance is compared to space-time regression kriging (STRK), RFsp, and regular RF using nested leave-location out 5-fold cross-validation (LLOCV).
 
-The scripts and data for the precipitation case study are in the *prcp_catalonia* folder, and are the following:
-- *catalonia_border* - a folder containing Catalonian border (ESRI Shapefile)
-- *dem_twi* - a folder containing digital elevation model (DEM) and topographic wetness index (TWI) for Catalonia (GeoTIFF)
-- *imerg* - a folder containing IMERG (Integrated Multi-satellitE Retrievals for GPM, Huffman et al. 2014) maps of daily precipitation estimates for 1–4 January 2016 (GeoTIFF)
-- *max* - a folder containing maximum daily temperature for 1–4 January 2016 estimated with models proposed by Kilibarda et al. (2014) (GeoTIFF)
-- *min* - a folder containing minimum daily temperature for 1–4 January 2016 estimated with models proposed by Kilibarda et al. (2014) (GeoTIFF)
-- *models* - a folder containing RF, RFsp, RFSI models, STRK trend (multiple linear regresion) model, STRK sample and fitted semivariogram (Rdata)
-- *temp_data* - a folder containing some of the data relevant to script 4 and 5 (Rdata)
-- *1_download_gpmdata.R* - a script for downloading the IMERG data
-- *2_residuals_ghcn_temp.R* - a script for calculation of the residuals for maximum and minimum daily tempreature
-- *3_prediction_temperature.R* - a script for prediction of maximum and minimum daily tempreature
-- *4_prcp_case_study_catalonia_RK.R* - a script for making the STRK, RF, RFsp, and RFSI models and LLOCV
-- *5_prcp_prediction.R* - a script for making prediction and interquartile range (IQR) maps from STRK, RF, RFsp, and RFSI models
-- *stratfolds.R* - a script for creation of spatially stratified folds
+The scripts and data for the precipitation case study are in the [prcp_catalonia](prcp_catalonia/) folder, and are the following:
+- [catalonia_border](prcp_catalonia/catalonia_border/) - a folder containing Catalonian border (ESRI Shapefile)
+- [dem_twi](prcp_catalonia/dem_twi/) - a folder containing digital elevation model (DEM) and topographic wetness index (TWI) for Catalonia (GeoTIFF)
+- [imerg](prcp_catalonia/imerg/) - a folder containing IMERG (Integrated Multi-satellitE Retrievals for GPM, Huffman et al. 2014) maps of daily precipitation estimates for 1–4 January 2016 (GeoTIFF)
+- [max](prcp_catalonia/max/) - a folder containing maximum daily temperature for 1–4 January 2016 estimated with models proposed by Kilibarda et al. (2014) (GeoTIFF)
+- [min](prcp_catalonia/min/) - a folder containing minimum daily temperature for 1–4 January 2016 estimated with models proposed by Kilibarda et al. (2014) (GeoTIFF)
+- [models](prcp_catalonia/models/) - a folder containing RF, RFsp, RFSI models, STRK trend (multiple linear regresion) model, STRK sample and fitted semivariogram (Rdata)
+- [temp_data](prcp_catalonia/temp_data/) - a folder containing some of the data relevant to script 4 and 5 (Rdata)
+- [1_download_gpmdata.R](prcp_catalonia/1_download_gpmdata.R) - a script for downloading the IMERG data
+- [2_residuals_ghcn_temp.R](prcp_catalonia/2_residuals_ghcn_temp.R) - a script for calculation of the residuals for maximum and minimum daily tempreature
+- [3_prediction_temperature.R](prcp_catalonia/3_prediction_temperature.R) - a script for prediction of maximum and minimum daily tempreature
+- [4_prcp_case_study_catalonia_RK.R](prcp_catalonia/4_prcp_case_study_catalonia_RK.R) - a script for making the STRK, RF, RFsp, and RFSI models and LLOCV
+- [5_prcp_prediction.R](prcp_catalonia/5_prcp_prediction.R) - a script for making prediction and interquartile range (IQR) maps from STRK, RF, RFsp, and RFSI models
+- [stratfolds.R](prcp_catalonia/stratfolds.R) - a script for creation of spatially stratified folds
 
-*Note that the number in the script name refers to the order in which the script should be run. Also, scripts 4 and 5 can be run with the data in folder temp_data.*
+*Note that the number in the script name refers to the order in which the scripts should be run. Also, scripts 4 and 5 can be run with the data in folder temp_data.*
 
 ## How to make an RFSI model
 
