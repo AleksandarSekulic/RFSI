@@ -19,7 +19,7 @@ The scripts and data for the synthetic case study are in the [simulation](simula
 
 ### Precipitation case study
 
-RFSI is applied to a daily precipitation dataset for Catalonia for the years 2016–2018. Its performance is compared to space-time regression kriging (STRK), RFsp, and regular RF using nested leave-location out 5-fold cross-validation (LLOCV).
+RFSI is applied to a daily precipitation dataset for Catalonia for the years 2016–2018. Its performance is compared to space-time regression kriging (STRK), IDW, RFsp, and regular RF using nested leave-location out 5-fold cross-validation (LLOCV).
 
 The scripts and data for the precipitation case study are in the [prcp_catalonia](prcp_catalonia/) folder, and are the following:
 - [catalonia_border](prcp_catalonia/catalonia_border/) - a folder containing Catalonian border (ESRI Shapefile),
@@ -32,11 +32,24 @@ The scripts and data for the precipitation case study are in the [prcp_catalonia
 - [1_download_gpmdata.R](prcp_catalonia/1_download_gpmdata.R) - a script for downloading the IMERG data,
 - [2_residuals_ghcn_temp.R](prcp_catalonia/2_residuals_ghcn_temp.R) - a script for calculation of the residuals for maximum and minimum daily tempreature,
 - [3_prediction_temperature.R](prcp_catalonia/3_prediction_temperature.R) - a script for prediction of maximum and minimum daily tempreature,
-- [4_prcp_case_study_catalonia_RK.R](prcp_catalonia/4_prcp_case_study_catalonia_RK.R) - a script for making the STRK, RF, RFsp, and RFSI models and LLOCV,
-- [5_prcp_prediction.R](prcp_catalonia/5_prcp_prediction.R) - a script for making prediction and interquartile range (IQR) maps from STRK, RF, RFsp, and RFSI models,
+- [4_prcp_case_study_catalonia_RK.R](prcp_catalonia/4_prcp_case_study_catalonia_RK.R) - a script for making the STRK, IDW, RF, RFsp, and RFSI models and LLOCV,
+- [5_prcp_prediction.R](prcp_catalonia/5_prcp_prediction.R) - a script for making prediction and interquartile range (IQR) maps from STRK, IDW, RF, RFsp, and RFSI models,
 - [stratfolds.R](prcp_catalonia/stratfolds.R) - a script for creation of spatially stratified folds.
 
 *Note that the number in the script name refers to the order in which the scripts should be run. Also, scripts 4 and 5 can be run with the data in folder temp_data.*
+
+### Temperature case study
+
+RFSI is applied to a daily mean temperature dataset for Croatia for the year 2018. Its performance is compared to space-time regression kriging (STRK), IDW, RFsp, and regular RF using nested leave-location out 10-fold cross-validation (LLOCV).
+
+The scripts and data for the precipitation case study are in the [temp_croatia](temp_croatia/) folder, and are the following:
+- [borders](temp_croatia/borders/) - a folder containing Croatian border (ESRI Shapefile),
+- [models](temp_croatia/models/) - a folder containing RF, RFsp (over 100 MB), RFSI models (Rdata),
+- [temp_data](temp_croatia/temp_data/) - a folder containing some of the data relevant to script 1 and 2 (Rdata),
+- [1_models.R](temp_croatia/1_models.R) - a script for making the IDW, RF, RFsp, and RFSI models and LLOCV,
+- [2_predictions.R](temp_croatia/2_predictions.R) - a script for making prediction maps from IDW, RF, RFsp, and RFSI models,
+- [dem.tif](temp_croatia/dem.tif) - digital elevation model (DEM) for Croatia (GeoTIFF),
+- [stratfolds.R](temp_croatia/stratfolds.R) - a script for creation of spatially stratified folds.
 
 ## How to make an RFSI model
 

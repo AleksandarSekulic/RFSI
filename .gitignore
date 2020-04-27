@@ -1,2 +1,4 @@
 *.Rhistory
 *plot/
+
+*RFsp.rda
