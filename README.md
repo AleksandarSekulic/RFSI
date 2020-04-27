@@ -15,6 +15,7 @@ For this case study, multiple realisations of a spatially autocorrelated random 
 The scripts and data for the synthetic case study are in the [simulation](simulation/) folder, and are the following:
 - [accuracy_results.rda](simulation/accuracy_results.rda) - R data frame with accuracy metrics from evaluation,
 - [boxplots.R](simulation/boxplots.R) - a script for making the boxplots from accuracy metrics (accuracy_results.rda),
+- [sim_500.R](simulation/sim_500.R) - a script for number of nearest locations sensitivity study,
 - [simulation.R](simulation/simulation.R) - a script for simulation, making the models and prediction maps, and calculation of the accuracy metrics for OK, RFSI, RFsp, IDW, NN, and TS.
 
 ### Precipitation case study
