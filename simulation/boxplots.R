@@ -84,7 +84,7 @@ for (nug in nugs) {
       geom_vline(xintercept = 6.5, linetype="dashed", size=0.2) +
       # geom_vline(xintercept = 7.5, linetype="dashed", size=0.2) +
       
-      xlab("Number of points used for training") +
+      xlab("Number of sample locations") +
       ylab(expression(R^{2})) +
       coord_cartesian(ylim = c(ymin, ymax)) +
       
@@ -143,7 +143,7 @@ for (nug in nugs) {
              geom_vline(xintercept = 6.5, linetype="dashed", size=0.2) +
              # geom_vline(xintercept = 7.5, linetype="dashed", size=0.2) +
              
-             xlab("Number of points used for training") +
+             xlab("Number of sample locations") +
              ylab("RMSE") +
              coord_cartesian(ylim = c(ymin, ymax)) +
              
@@ -201,7 +201,7 @@ for (nug in nugs) {
              geom_vline(xintercept = 6.5, linetype="dashed", size=0.2) +
              # geom_vline(xintercept = 7.5, linetype="dashed", size=0.2) +
              
-             xlab("Number of points used for training") +
+             xlab("Number of sample locations") +
              ylab("CCC") +
              coord_cartesian(ylim = c(ymin, ymax)) +
              
@@ -258,7 +258,7 @@ for (nug in nugs) {
              geom_vline(xintercept = 6.5, linetype="dashed", size=0.2) +
              # geom_vline(xintercept = 7.5, linetype="dashed", size=0.2) +
              
-             xlab("Number of points used for training") +
+             xlab("Number of sample locations") +
              ylab("MAE") +
              coord_cartesian(ylim = c(ymin, ymax)) +
              
@@ -315,7 +315,7 @@ for (nug in nugs) {
              geom_vline(xintercept = 6.5, linetype="dashed", size=0.2) +
              # geom_vline(xintercept = 7.5, linetype="dashed", size=0.2) +
              
-             xlab("Number of points used for training") +
+             xlab("Number of sample locations") +
              ylab("ME") +
              coord_cartesian(ylim = c(ymin, ymax)) +
              
@@ -406,7 +406,7 @@ assign(paste("dt", sep=""),
                            values=c("chartreuse4", "deepskyblue")) +
          scale_color_manual(breaks = c("RFSI", "RFsp"),
                             values=c("chartreuse4", "deepskyblue")) +
-         xlab("Number of points used for training") +
+         xlab("Number of sample locations") +
          ylab("Distance calculation time [sec]") +
          theme(plot.title = element_text(hjust = 8),
                axis.text = element_text(size = 8),
@@ -487,7 +487,7 @@ assign(paste("mt", sep=""),
                            values=c("chartreuse4", "deepskyblue")) +
          scale_color_manual(breaks = c("RFSI", "RFsp"),
                             values=c("chartreuse4", "deepskyblue")) +
-         xlab("Number of points used for training") +
+         xlab("Number of sample locations") +
          ylab("Modelling time [sec]") +
          theme(plot.title = element_text(hjust = 8),
                axis.text = element_text(size = 8),
@@ -538,7 +538,7 @@ assign(paste("pt", sep=""),
                            values=c("red", "chartreuse4", "deepskyblue")) +
          scale_color_manual(breaks = c("OK", "RFSI", "RFsp"),
                             values=c("red", "chartreuse4", "deepskyblue")) +
-         xlab("Number of points used for training") +
+         xlab("Number of sample locations") +
          ylab("Prediction time [sec]") +
          theme(plot.title = element_text(hjust = 8),
                axis.text = element_text(size = 8),

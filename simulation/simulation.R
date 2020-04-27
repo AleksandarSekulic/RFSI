@@ -1,10 +1,10 @@
 ### install latest version of R meteo package ###
-install.packages("meteo", repos="http://R-Forge.R-project.org")
+# install.packages("meteo", repos="http://R-Forge.R-project.org")
 
 # build from source
-library(devtools)
-build(pkg = "/home/sekulic/meteo/packageWV/pkg/")
-install(pkg = "/home/sekulic/meteo/packageWV/pkg/")
+# library(devtools)
+# build(pkg = "/home/sekulic/meteo/packageWV/pkg/")
+# install(pkg = "/home/sekulic/meteo/packageWV/pkg/")
 
 ### load packages ###
 library(raster)
@@ -384,36 +384,36 @@ for (nug in nugs) {
         gc();gc()
         rm(grid.distP)
         
-        ##########################################################################################
-        ### Predictions ##########################################################################
-        ##########################################################################################
-
-        dir.create("plot")
-
-        all_plot <- as(ok_raster, "SpatialPixelsDataFrame")
-        names(all_plot) <- "OK"
-        all_plot$SIM <- sim_ok$sim1
-        all_plot@data <- all_plot@data[, 2:1]
-        all_plot$RFSI <- values(rfsi_raster)
-        # all_plot$RFSIavg <- values(rfsi_avg_raster)
-        all_plot$RFsp <- values(rfsp_raster)
-        all_plot$IDW <- values(idw_raster)
-        all_plot$NN <- values(nn_raster)
-        all_plot$TS2 <- values(ts2_raster)
-        # all_plot$fold <- sim_ok$fold
-        pts <- train
-
-        ### Fig5 ###
-        # tiff(paste("plot/pred_comparison_", n_po, "_s", seed, "_nug", nug, ".tif", sep = ""), width = 174, height = 93, units = 'mm', res = 600, compression = "lzw")
-        jpeg(paste("plot/pred_comparison_", n_po, "_s", seed, "_nug", nug, ".jpeg", sep = ""), width = 174, height = 93, units = 'mm', res = 600) # res = 1200
-        print(spplot(all_plot, col.regions=terrain.colors, par.settings=list(fontsize=list(text=7)),
-                     sp.layout = list(pts, which=1, col="black", cex=0.1, alpha=0.5),
-                     # scales = list(draw = TRUE),
-                     as.table=TRUE
-                     )) #, main = "Comparison of predictions"
-        dev.off()
-
-        ##########################################################################################
+        # ##########################################################################################
+        # ### Predictions ##########################################################################
+        # ##########################################################################################
+        # 
+        # dir.create("plot")
+        # 
+        # all_plot <- as(ok_raster, "SpatialPixelsDataFrame")
+        # names(all_plot) <- "OK"
+        # all_plot$SIM <- sim_ok$sim1
+        # all_plot@data <- all_plot@data[, 2:1]
+        # all_plot$RFSI <- values(rfsi_raster)
+        # # all_plot$RFSIavg <- values(rfsi_avg_raster)
+        # all_plot$RFsp <- values(rfsp_raster)
+        # all_plot$IDW <- values(idw_raster)
+        # all_plot$NN <- values(nn_raster)
+        # all_plot$TS2 <- values(ts2_raster)
+        # # all_plot$fold <- sim_ok$fold
+        # pts <- train
+        # 
+        # ### Fig5 ###
+        # # tiff(paste("plot/pred_comparison_", n_po, "_s", seed, "_nug", nug, ".tif", sep = ""), width = 174, height = 93, units = 'mm', res = 600, compression = "lzw")
+        # jpeg(paste("plot/pred_comparison_", n_po, "_s", seed, "_nug", nug, ".jpeg", sep = ""), width = 174, height = 93, units = 'mm', res = 600) # res = 1200
+        # print(spplot(all_plot, col.regions=terrain.colors, par.settings=list(fontsize=list(text=7)),
+        #              sp.layout = list(pts, which=1, col="black", cex=0.1, alpha=0.5),
+        #              # scales = list(draw = TRUE),
+        #              as.table=TRUE
+        #              )) #, main = "Comparison of predictions"
+        # dev.off()
+        # 
+        # ##########################################################################################
         
         # ##########################################################################################
         # ### plot residuals with all combinations #################################################
@@ -529,7 +529,7 @@ for (nug in nugs) {
         # ### Fig6 ###
         # # tiff("plot/importance.tiff", width = 75, height = 70, units = 'mm', res = 1200, compression = "lzw")
         # jpeg("plot/importance.jpeg", width = 75, height = 70, units = 'mm', res = 1200)
-        # ggarrange(rfsi_importance, rfsp_importance, ncol=2, nrow=1, common.legend = TRUE, legend="bottom")
+        # ggarrange(rfsp_importance, rfsi_importance, ncol=2, nrow=1, common.legend = TRUE, legend="bottom")
         # dev.off()
         # ##########################################################################################
         

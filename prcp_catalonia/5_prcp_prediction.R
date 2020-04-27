@@ -130,6 +130,38 @@ for(j in 1:daysNum){
   rm(pre, iqr, p)
 }
 
+###### IDW - prediction ###################################################################
+
+dir.create("../predictions/idw")
+
+load(file = "stfdf_temp.rda")
+
+pp = 2.2
+n = 13
+
+registerDoParallel(cores=detectCores()-1)
+foreach(i = 1:daysNum, .packages = c("raster","spacetime","gstat","rgdal","raster","doParallel","meteo")) %dopar% {
+  
+  st <- stfdf[, i]
+  st <- st[!is.na(st$prcp), "prcp"]
+  
+  ##############
+  
+  gs <- gstat(formula=prcp~1, locations=st, nmax = n, set=list(idp = pp))
+  pre <- predict(gs, gg)
+  pre <- round(pre$var1.pred * 100)
+  
+  gg@data$pred=pre
+  p <- try( raster( as(gg["pred"], "SpatialPixelsDataFrame")) )
+  if(inherits(p, "try-error")) {
+    p <- rasterize( gg, r, "pred")
+  }
+  writeRaster(p, paste("../predictions/idw/", days[i], sep = ""), "GTiff",NAflag= -32767, datatype='INT2S', overwrite=T)
+  rm(pre, p)
+  
+}
+stopImplicitCluster()
+
 ###### RF - prediction ###################################################################
 
 dir.create("../predictions/rf")
@@ -206,7 +238,7 @@ st_proj <- stfdf@sp
 
 temp <- stfdf[ , time]
 
-n_obs = 10
+n_obs = 7
 
 registerDoParallel(cores=detectCores()-1)
 foreach(i = 1:daysNum, .packages = c("raster","spacetime","gstat","rgdal","raster","doParallel","meteo")) %dopar% {
@@ -380,7 +412,7 @@ summary(stfdf[ , time[2], "prcp"])
 summary(stfdf[ , time[3], "prcp"])
 summary(stfdf[ , time[4], "prcp"])
 
-met <- c("strk", "rf", "rfsi", "rfsp")
+met <- c("strk", "idw", "rf", "rfsp", "rfsi")
 
 pred <- raster(paste("../predictions/", met[1], "/",
                      days[1], ".tif", sep = "")) / 100
@@ -411,27 +443,30 @@ max(pred@data)
 max(pred@data$rf4)
 max(pred@data$rfsp4)
 max(pred@data$rfsi4)
+max(pred@data$idw4)
 max(pred@data$strk4)
 min(pred@data)
 
 pal <- colorRampPalette(brewer.pal(9, "Blues"))
 cut <- c(floor(min(pred@data)), 0.5, 1, 1.5, 2, 3, 4, 6, 8, 15, ceiling(max(pred@data)))
-cut2 <- cut
+# cut2 <- cut
+cut2 <- c(floor(min(pred@data)), 2, 4, 6, 8, 15, ceiling(max(pred@data)))
 
 s <- stack(strk1, strk2, strk3, strk4,
+           idw1, idw2, idw3, idw4,
            rf1, rf2, rf3, rf4,
-           rfsi1, rfsi2, rfsi3, rfsi4,
-           rfsp1, rfsp2, rfsp3, rfsp4)
+           rfsp1, rfsp2, rfsp3, rfsp4,
+           rfsi1, rfsi2, rfsi3, rfsi4)
 
-met2 <- c("STRK", "RF", "RFSI", "RFsp")
+met2 <- c("STRK", "IDW", "RF", "RFsp", "RFSI")
 
 time_max <- c()
 for (i in 1:4){
   time_max <- c(time_max, paste("max: ", max(stfdf[ , time[i]]$prcp), " mm\n", sep = ""))
 }
 
-# tiff("../plot/predictions.tiff", width = 100, height = 130, units = 'mm', res = 600, compression = "lzw")
-jpeg("../plot/predictions.jpeg", width = 100, height = 130, units = 'mm', res = 600)
+# tiff("../plot/predictions.tiff", width = 100, height = 150, units = 'mm', res = 600, compression = "lzw")
+jpeg("../plot/predictions.jpeg", width = 100, height = 150, units = 'mm', res = 600)
 levelplot(s, 
           margin=FALSE,                       
           colorkey=list(
@@ -451,7 +486,7 @@ levelplot(s,
           names.attr=rep('', nlayers(s)),
           xlab.top=list(as.character(time), cex=0.7, fontface='bold'), xlab=list(as.character(time_max), cex=0.7),
           ylab=list(rev(met2), cex=0.7, fontface='bold'),
-          layout=c(4, 4),
+          layout=c(4, 5),
           as.table = TRUE) +
   layer(sp.points(stfdf@sp, pch=3, col="black", cex=0.1, alpha=0.5)) +
   layer(sp.polygons(border, lwd=0.1)) +
@@ -465,15 +500,15 @@ levelplot(s,
               default.units='native')
   }, packets = 4)+
   layer({
-    xs <- seq(1.45, 3.15, by=0.85)
+    xs <- seq(1.45, 3.15, by=0.85) # 
     grid.rect(x=xs[-3], y=40.9,
               width=0.85, height=0.07,
               gp=gpar(fill=c('black', 'transparent')),
               default.units='native')
-    grid.text(x= xs - 0.4, y=40.7, c(0, 75, "150km"),# seq(0, 150, by=75),
+    grid.text(x= xs - 0.4, y=40.7, c(0, 75, "150km"),# seq(0, 150, by=75), # 0 100 200
               gp=gpar(cex=0.5), rot=0,
               default.units='native')
-  }, packets = 16)
+  }, packets = 20)
 dev.off()
 
 ###### IQR plots###################################################################
@@ -481,7 +516,7 @@ dev.off()
 load('stfdf_temp.rda')
 stfdf <- stfdf[!is.na(stfdf[, 1]$prcp), ]
 
-met <- c("strk", "rf", "rfsi", "rfsp")
+met <- c("strk", "rf", "rfsp", "rfsi")
 
 pred <- raster(paste("../predictions/", met[1], "/",
                      days[1], "_iqr.tif", sep = "")) / 100
@@ -512,14 +547,14 @@ max(pred@data)
 min(pred@data)
 
 pal <- colorRampPalette(brewer.pal(9, "YlOrRd")[1:9])
-cut <- c(0, 0.5, 1, 2, 3, 4, 5, 6, 7, 14, ceiling(max(pred@data)))
+cut <- c(0, 0.5, 1, 2, 3, 4, 5, 6, 7, 13, ceiling(max(pred@data)))
 
 s <- stack(strk1, strk2, strk3, strk4,
            rf1, rf2, rf3, rf4,
-           rfsi1, rfsi2, rfsi3, rfsi4,
-           rfsp1, rfsp2, rfsp3, rfsp4)
+           rfsp1, rfsp2, rfsp3, rfsp4,
+           rfsi1, rfsi2, rfsi3, rfsi4)
 
-met2 <- c("STRK", "RF", "RFSI", "RFsp")
+met2 <- c("STRK", "RF", "RFsp", "RFSI")
 
 # tiff("../plot/iqr.tiff", width = 100, height = 130, units = 'mm', res = 600, compression = "lzw")
 jpeg("../plot/iqr.jpeg", width = 100, height = 130, units = 'mm', res = 600)
