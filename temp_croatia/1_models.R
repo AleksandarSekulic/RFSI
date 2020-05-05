@@ -933,7 +933,7 @@ mean((rfsp_10f_obs - rfsp_10f_pred), na.rm=TRUE)
 
 ###### create RFSI model ###################################################################
 
-load(file = "stfdf.rda")
+load("stfdf.rda")
 
 temp_df = as.data.frame(stfdf)
 temp_df <- temp_df[, c("lon", "lat", "sp.ID", "time", covariates)]
@@ -953,27 +953,6 @@ ntree <- 250 # 500
 n_obs = max(nos)
 mtry <- 3:(9+2*n_obs)
 
-cpus <- detectCores()-1
-registerDoParallel(cores=cpus)
-nearest_obs <- foreach (t = time) %dopar% {
-  
-  day_df <- temp_df[temp_df$time==t, c("lon", "lat", "TEMP")]
-  if (nrow(day_df)==0) {
-    return(NULL)
-  }
-  return(near.obs(
-    locations = day_df,
-    observations = day_df,
-    zcol = "TEMP",
-    n.obs = n_obs
-  ))
-  
-}
-stopImplicitCluster()
-
-nearest_obs <- do.call("rbind", nearest_obs)
-temp_df <- cbind(temp_df, nearest_obs)
-
 indices <- CreateSpacetimeFolds(temp_df,spacevar = "sp.ID",
                                 k=5, seed = 42)
 
@@ -989,14 +968,45 @@ for (h in 1:nrow(hp)) {
   print(paste("combination: ", h, sep=""))
   print(comb)
   
+  dev_df <- temp_df
+  
   fold_obs <- c()
   fold_pred <- c()
   
   for (f in 1:length(indices$index)) {
     print(paste("fold: ", f, sep=""))
     cols <- c(covariates, paste("dist", 1:(comb$no), sep=""), paste("obs", 1:(comb$no), sep=""))
-    dev_df1 <- temp_df[indices$index[[f]], cols]
-    val_df1 <- temp_df[indices$indexOut[[f]], cols]
+    dev_df1 <- dev_df[indices$index[[f]], ]
+    
+    cpus <- detectCores()-1
+    registerDoParallel(cores=cpus)
+    nearest_obs <- foreach (t = time) %dopar% {
+      
+      dev_day_df <- dev_df1[dev_df1$time==t, c("lon", "lat", "TEMP")]
+      day_df <- dev_df[dev_df$time==t, c("lon", "lat", "TEMP")]
+      
+      if (nrow(day_df)==0) {
+        return(NULL)
+      }
+      return(near.obs(
+        locations = day_df,
+        observations = dev_day_df,
+        zcol = "TEMP",
+        n.obs = comb$no
+      ))
+      
+    }
+    stopImplicitCluster()
+    
+    nearest_obs <- do.call("rbind", nearest_obs)
+    dev_df <- cbind(dev_df, nearest_obs)
+    dev_df = dev_df[complete.cases(dev_df), ]
+    
+    
+    dev_df1 <- dev_df[indices$index[[f]], cols]
+    dev_df1 <- dev_df1[complete.cases(dev_df1), ]
+    val_df1 <- dev_df[indices$indexOut[[f]], cols]
+    val_df1 <- val_df1[complete.cases(val_df1), ]
     
     model <- ranger(TEMP ~ ., data = dev_df1, importance = "none", seed = 42,
                     num.trees = ntree, mtry = comb$mtry,
@@ -1016,8 +1026,29 @@ for (h in 1:nrow(hp)) {
 
 dev_parameters <- hp[which.min(rmse_hp), ]
 print(dev_parameters)
-# min.node.size mtry no  sf
-# 14682            15    5 10 0.9
+# min.node.size mtry no   sf
+# 5344             6    4  7 0.95
+
+cpus <- detectCores()-1
+registerDoParallel(cores=cpus)
+nearest_obs <- foreach (t = time) %dopar% {
+  
+  day_df <- temp_df[temp_df$time==t, c("lon", "lat", "TEMP")]
+  if (nrow(day_df)==0) {
+    return(NULL)
+  }
+  return(near.obs(
+    locations = day_df,
+    observations = day_df,
+    zcol = "TEMP",
+    n.obs = dev_parameters$no
+  ))
+  
+}
+stopImplicitCluster()
+
+nearest_obs <- do.call("rbind", nearest_obs)
+temp_df <- cbind(temp_df, nearest_obs)
 
 cols <- c(covariates, paste("dist", 1:(dev_parameters$no), sep=""), paste("obs", 1:(dev_parameters$no), sep=""))
 temp_df <- temp_df[, cols]
@@ -1033,9 +1064,9 @@ rfsi_model <- ranger(TEMP ~ ., data = temp_df, importance = "impurity", seed = 4
 load(file = "../models/RFSI.rda")
 
 rfsi_model$r.squared
-# 0.9859053
+# 0.736633
 sqrt(rfsi_model$prediction.error)
-# 0.9054972
+# 3.530753
 
 ###### RFSI - 10-fold CV ###################################################################
 
@@ -1245,14 +1276,14 @@ sample.fraction <- seq(1, 0.632, -0.05) # 0.632 without / 1 with replacement
 ntree <- 250 # 500
 
 n_obs = max(nos)
-mtry <- 3:(9+2*n_obs)
+mtry <- 3:(2*n_obs)
 
 indices <- CreateSpacetimeFolds(temp_df,spacevar = "sp.ID",
                                 k=5, seed = 42)
 
 hp <- expand.grid(min.node.size=min.node.size,
                   mtry=mtry, no=nos, sf=sample.fraction)
-hp <- hp[hp$mtry < (9+2*hp$no-1), ]
+hp <- hp[hp$mtry < (2*hp$no-1), ]
 hp <- hp[sample(nrow(hp), 100),]
 hp <- hp[order(hp$no),]
 rmse_hp <- rep(NA, nrow(hp))
@@ -1269,12 +1300,12 @@ for (h in 1:nrow(hp)) {
   
   for (f in 1:length(indices$index)) {
     print(paste("fold: ", f, sep=""))
-    cols <- c(covariates, paste("dist", 1:(comb$no), sep=""), paste("obs", 1:(comb$no), sep=""))
+    cols <- c("TEMP", paste("dist", 1:(comb$no), sep=""), paste("obs", 1:(comb$no), sep=""))
     dev_df1 <- dev_df[indices$index[[f]], ]
     
     cpus <- detectCores()-1
     registerDoParallel(cores=cpus)
-    nearest_obs <- foreach (t = time) %dopar% {
+    nearest_obs <- foreach (t = time, .packages = c("meteo")) %dopar% {
       
       dev_day_df <- dev_df1[dev_df1$time==t, c("lon", "lat", "TEMP")]
       day_df <- dev_df[dev_df$time==t, c("lon", "lat", "TEMP")]
@@ -1320,12 +1351,12 @@ for (h in 1:nrow(hp)) {
 
 dev_parameters <- hp[which.min(rmse_hp), ]
 print(dev_parameters)
-# min.node.size mtry no   sf
-# 5344             6    4  7 0.95
+# min.node.size mtry no  sf
+# 19820             4    6 10 0.8
 
 cpus <- detectCores()-1
 registerDoParallel(cores=cpus)
-nearest_obs <- foreach (t = time) %dopar% {
+nearest_obs <- foreach (t = time, .packages = c("meteo")) %dopar% {
   
   day_df <- temp_df[temp_df$time==t, c("lon", "lat", "TEMP")]
   if (nrow(day_df)==0) {
@@ -1344,23 +1375,23 @@ stopImplicitCluster()
 nearest_obs <- do.call("rbind", nearest_obs)
 temp_df <- cbind(temp_df, nearest_obs)
 
-cols <- c(covariates, paste("dist", 1:(dev_parameters$no), sep=""), paste("obs", 1:(dev_parameters$no), sep=""))
+cols <- c("TEMP", paste("dist", 1:(dev_parameters$no), sep=""), paste("obs", 1:(dev_parameters$no), sep=""))
 temp_df <- temp_df[, cols]
 
-rfsi_model <- ranger(TEMP ~ ., data = temp_df, importance = "impurity", seed = 42,
-                     num.trees = ntree, mtry = dev_parameters$mtry,
-                     splitrule = "variance",
-                     min.node.size = dev_parameters$min.node.size,
-                     sample.fraction = dev_parameters$sf,
-                     quantreg = TRUE) ### quantreg???
+rfsi2_model <- ranger(TEMP ~ ., data = temp_df, importance = "impurity", seed = 42,
+                      num.trees = ntree, mtry = dev_parameters$mtry,
+                      splitrule = "variance",
+                      min.node.size = dev_parameters$min.node.size,
+                      sample.fraction = dev_parameters$sf,
+                      quantreg = TRUE) ### quantreg???
 
-# save(rfsi_model, file = "../models/RFSI.rda")
-load(file = "../models/RFSI.rda")
+# save(rfsi2_model, file = "../models/RFSI2.rda")
+load(file = "../models/RFSI2.rda")
 
-rfsi_model$r.squared
-# 0.736633
-sqrt(rfsi_model$prediction.error)
-# 3.530753
+rfsi2_model$r.squared
+# 0.9808053
+sqrt(rfsi2_model$prediction.error)
+# 1.056696
 
 ###### RFSI without covariates - 10-fold CV ###################################################################
 

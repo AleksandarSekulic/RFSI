@@ -1949,14 +1949,14 @@ sample.fraction <- seq(1, 0.632, -0.05) # 0.632 without / 1 with replacement
 ntree <- 250 # 500
 
 n_obs = max(nos)
-mtry <- 3:(2+2*n_obs)
+mtry <- 3:(2*n_obs-1)
 
 indices <- CreateSpacetimeFolds(temp_df,spacevar = "staid",
                                 k=5, seed = 42)
 
 hp <- expand.grid(min.node.size=min.node.size,
                   mtry=mtry, no=nos, sf=sample.fraction)
-hp <- hp[hp$mtry < (3+2*hp$no-1), ]
+hp <- hp[hp$mtry < (2*hp$no), ]
 hp <- hp[sample(nrow(hp), 100),]
 hp <- hp[order(hp$no),]
 rmse_hp <- rep(NA, nrow(hp))
@@ -1973,7 +1973,7 @@ for (h in 1:nrow(hp)) {
   
   for (f in 1:length(indices$index)) {
     print(paste("fold: ", f, sep=""))
-    cols <- c(covariates, paste("dist", 1:(comb$no), sep=""), paste("obs", 1:(comb$no), sep=""))
+    cols <- c("prcp", paste("dist", 1:(comb$no), sep=""), paste("obs", 1:(comb$no), sep=""))
     dev_df1 <- dev_df[indices$index[[f]], ]
     
     cpus <- detectCores()-1
@@ -2024,8 +2024,8 @@ for (h in 1:nrow(hp)) {
 
 dev_parameters <- hp[which.min(rmse_hp), ]
 print(dev_parameters)
-# min.node.size mtry no   sf
-# 5344             6    4  7 0.95
+# min.node.size mtry no  sf
+# 11443             6    5 12 0.9
 
 cpus <- detectCores()-1
 registerDoParallel(cores=cpus)
@@ -2048,23 +2048,23 @@ stopImplicitCluster()
 nearest_obs <- do.call("rbind", nearest_obs)
 temp_df <- cbind(temp_df, nearest_obs)
 
-cols <- c(covariates, paste("dist", 1:(dev_parameters$no), sep=""), paste("obs", 1:(dev_parameters$no), sep=""))
+cols <- c("prcp", paste("dist", 1:(dev_parameters$no), sep=""), paste("obs", 1:(dev_parameters$no), sep=""))
 temp_df <- temp_df[, cols]
 
-rfsi_model <- ranger(prcp ~ ., data = temp_df, importance = "impurity", seed = 42,
-                     num.trees = ntree, mtry = dev_parameters$mtry,
-                     splitrule = "variance",
-                     min.node.size = dev_parameters$min.node.size,
-                     sample.fraction = dev_parameters$sf,
-                     quantreg = TRUE) ### quantreg???
+rfsi2_model <- ranger(prcp ~ ., data = temp_df, importance = "impurity", seed = 42,
+                      num.trees = ntree, mtry = dev_parameters$mtry,
+                      splitrule = "variance",
+                      min.node.size = dev_parameters$min.node.size,
+                      sample.fraction = dev_parameters$sf,
+                      quantreg = TRUE) ### quantreg???
 
-# save(rfsi_model, file = "../models/RFSI.rda")
-load(file = "../models/RFSI.rda")
+# save(rfsi2_model, file = "../models/RFSI2.rda")
+load(file = "../models/RFSI2.rda")
 
-rfsi_model$r.squared
-# 0.736633
-sqrt(rfsi_model$prediction.error)
-# 3.530753
+rfsi2_model$r.squared
+# 0.7341265
+sqrt(rfsi2_model$prediction.error)
+# 3.547514
 
 ###### RFSI without covariates - 5-fold CV ###################################################################
 
@@ -2403,11 +2403,17 @@ jpeg("../plot/importance.jpeg", width = 110, height = 70, units = 'mm', res = 12
 ggarrange(rf_importance, rfsp_importance, rfsi_importance, ncol=3, nrow=1, common.legend = TRUE, legend="bottom")
 dev.off()
 
-###### CV error histogram, scatter plot ###################################################################
+###### CV error histogram, scatter plot, analysis if zeros ###################################################################
 
 load(file = "STRK_5f_pred.rda")
 load(file = "STRK_5f_obs.rda")
+
+STRK_5f_pred <- STRK_5f_pred[!is.na(STRK_5f_obs)]
+STRK_5f_obs <- STRK_5f_obs[!is.na(STRK_5f_obs)]
+
 summary(STRK_5f_pred)
+length(STRK_5f_pred[STRK_5f_pred<0]) / length(STRK_5f_pred) * 100
+
 STRK_5f_pred <- ifelse(STRK_5f_pred<0, 0, STRK_5f_pred)
 
 load(file = "IDW_5f_obs.rda")
@@ -2416,11 +2422,53 @@ load(file = "IDW_5f_pred.rda")
 load(file = "rfsi_5f_obs.rda")
 load(file = "rfsi_5f_pred.rda")
 
+load(file = "rfsi2_5f_obs.rda")
+load(file = "rfsi2_5f_pred.rda")
+
 load(file = "rfsp_5f_obs.rda")
 load(file = "rfsp_5f_pred.rda")
 
 load(file = "rf_5f_obs.rda")
 load(file = "rf_5f_pred.rda")
+
+### zeros ###
+
+length(STRK_5f_obs[STRK_5f_obs<1 & STRK_5f_pred<1]) # / length(STRK_5f_obs[STRK_5f_obs<1]) * 100
+length(STRK_5f_obs[STRK_5f_obs<1 & STRK_5f_pred>=1])
+length(STRK_5f_obs[STRK_5f_obs>=1 & STRK_5f_pred<1])
+length(STRK_5f_obs[STRK_5f_obs>=1 & STRK_5f_pred>=1])
+
+length(IDW_5f_obs[IDW_5f_obs<1 & IDW_5f_pred<1])
+length(IDW_5f_obs[IDW_5f_obs<1 & IDW_5f_pred>=1])
+length(IDW_5f_obs[IDW_5f_obs>=1 & IDW_5f_pred<1])
+length(IDW_5f_obs[IDW_5f_obs>=1 & IDW_5f_pred>=1])
+
+length(rf_5f_obs[rf_5f_obs<1 & rf_5f_pred<1])
+length(rf_5f_obs[rf_5f_obs<1 & rf_5f_pred>=1])
+length(rf_5f_obs[rf_5f_obs>=1 & rf_5f_pred<1])
+length(rf_5f_obs[rf_5f_obs>=1 & rf_5f_pred>=1])
+
+length(rfsp_5f_obs[rfsp_5f_obs<1 & rfsp_5f_pred<1])
+length(rfsp_5f_obs[rfsp_5f_obs<1 & rfsp_5f_pred>=1])
+length(rfsp_5f_obs[rfsp_5f_obs>=1 & rfsp_5f_pred<1])
+length(rfsp_5f_obs[rfsp_5f_obs>=1 & rfsp_5f_pred>=1])
+
+length(rfsi_5f_obs[rfsi_5f_obs<1 & rfsi_5f_pred<1])
+length(rfsi_5f_obs[rfsi_5f_obs<1 & rfsi_5f_pred>=1])
+length(rfsi_5f_obs[rfsi_5f_obs>=1 & rfsi_5f_pred<1])
+length(rfsi_5f_obs[rfsi_5f_obs>=1 & rfsi_5f_pred>=1])
+
+length(rfsi2_5f_obs[rfsi2_5f_obs<1 & rfsi2_5f_pred<1])
+length(rfsi2_5f_obs[rfsi2_5f_obs<1 & rfsi2_5f_pred>=1])
+length(rfsi2_5f_obs[rfsi2_5f_obs>=1 & rfsi2_5f_pred<1])
+length(rfsi2_5f_obs[rfsi2_5f_obs>=1 & rfsi2_5f_pred>=1])
+
+###
+
+length(STRK_5f_obs[STRK_5f_obs==0 & STRK_5f_pred==0]) # / length(STRK_5f_obs[STRK_5f_obs<1]) * 100
+length(STRK_5f_obs[STRK_5f_obs==0 & STRK_5f_pred!=0])
+length(STRK_5f_obs[STRK_5f_obs!=0 & STRK_5f_pred==0])
+length(STRK_5f_obs[STRK_5f_obs!=0 & STRK_5f_pred!=0])
 
 # # tiff("../plot/scaterplot.tiff", width = 174, height = 65, units = 'mm', res = 600, compression = "lzw")
 # jpeg("../plot/scaterplot.jpeg", width = 174, height = 65, units = 'mm', res = 600)
@@ -2435,20 +2483,33 @@ load(file = "rf_5f_pred.rda")
 # abline(a=0, b=1, col="red")
 # dev.off()
 
-STRK_5f_pred <- STRK_5f_pred[!is.na(STRK_5f_obs)]
-STRK_5f_obs <- STRK_5f_obs[!is.na(STRK_5f_obs)]
 STRK_res <- STRK_5f_obs-STRK_5f_pred
 # STRK_res <- STRK_res[abs(STRK_res)>50]
 IDW_5f_res <- IDW_5f_obs-IDW_5f_pred
 rf_5f_res <- rf_5f_obs-rf_5f_pred
 rfsi_5f_res <- rfsi_5f_obs-rfsi_5f_pred
 rfsp_5f_res <- rfsp_5f_obs-rfsp_5f_pred
+rfsi2_5f_res <- rfsi2_5f_obs-rfsi2_5f_pred
 
 summary(STRK_res)
 summary(IDW_5f_res)
 summary(rf_5f_res)
 summary(rfsi_5f_res)
 summary(rfsp_5f_res)
+
+sqrt(mean((STRK_res[STRK_5f_obs < 1])^2))
+sqrt(mean((IDW_5f_res[IDW_5f_obs < 1])^2))
+sqrt(mean((rf_5f_res[rf_5f_obs < 1])^2))
+sqrt(mean((rfsp_5f_res[rfsp_5f_obs < 1])^2))
+sqrt(mean((rfsi_5f_res[rfsi_5f_obs < 1])^2))
+sqrt(mean((rfsi2_5f_res[rfsi2_5f_obs < 1])^2))
+
+sqrt(mean((STRK_res[STRK_5f_obs >= 1])^2))
+sqrt(mean((IDW_5f_res[IDW_5f_obs >= 1])^2))
+sqrt(mean((rf_5f_res[rf_5f_obs >= 1])^2))
+sqrt(mean((rfsp_5f_res[rfsp_5f_obs >= 1])^2))
+sqrt(mean((rfsi_5f_res[rfsi_5f_obs >= 1])^2))
+sqrt(mean((rfsi2_5f_res[rfsi2_5f_obs >= 1])^2))
 
 # STRK_res[which.max(STRK_5f_obs)]
 # rf_5f_res[which.max(rf_5f_obs)]
@@ -2494,7 +2555,7 @@ strk_sp <- ggplot(data, aes(x=STRK_5f_pred, y=STRK_5f_obs) ) +
         legend.margin = unit(0, "cm"),
         legend.title = element_text(size = 7, face="bold"),
         legend.text=element_text(size = 7)) +
-  labs(x = "Residuals [mm]", y = "Observations [mm]", title = "STRK") + coord_fixed()+
+  labs(x = "Predictions [mm]", y = "Observations [mm]", title = "STRK") + coord_fixed()+
   xlim(0, 150) + ylim(0, 150) +
   geom_abline(slope=1, intercept=0, size = 0.1)
 strk_sp
@@ -2514,7 +2575,7 @@ idw_sp <- ggplot(data, aes(x=IDW_5f_pred, y=IDW_5f_obs) ) +
         legend.margin = unit(0, "cm"),
         legend.title = element_text(size = 7, face="bold"),
         legend.text=element_text(size = 7)) +
-  labs(x = "Residuals [mm]", y = "Observations [mm]", title = "IDW") + coord_fixed()+
+  labs(x = "Predictions [mm]", y = "Observations [mm]", title = "IDW") + coord_fixed()+
   xlim(0, 150) + ylim(0, 150) +
   geom_abline(slope=1, intercept=0, size = 0.1)
 
@@ -2533,7 +2594,7 @@ rf_sp <- ggplot(data, aes(x=rf_5f_pred, y=rf_5f_obs) ) +
         legend.margin = unit(0, "cm"),
         legend.title = element_text(size = 7, face="bold"),
         legend.text=element_text(size = 7)) +
-  labs(x = "Residuals [mm]", y = "Observations [mm]", title = "RF") + coord_fixed()+
+  labs(x = "Predictions [mm]", y = "Observations [mm]", title = "RF") + coord_fixed()+
   xlim(0, 150) + ylim(0, 150) +
   geom_abline(slope=1, intercept=0, size = 0.1)
 
@@ -2552,7 +2613,7 @@ rfsi_sp <- ggplot(data, aes(x=rfsi_5f_pred, y=rfsi_5f_obs) ) +
         legend.margin = unit(0, "cm"),
         legend.title = element_text(size = 7, face="bold"),
         legend.text=element_text(size = 7)) +
-  labs(x = "Residuals [mm]", y = "Observations [mm]", title = "RFSI") + coord_fixed()+
+  labs(x = "Predictions [mm]", y = "Observations [mm]", title = "RFSI") + coord_fixed()+
   xlim(0, 150) + ylim(0, 150) +
   geom_abline(slope=1, intercept=0, size = 0.1)
 
@@ -2571,7 +2632,7 @@ rfsp_sp <- ggplot(data, aes(x=rfsp_5f_pred, y=rfsp_5f_obs) ) +
         legend.margin = unit(0, "cm"),
         legend.title = element_text(size = 7, face="bold"),
         legend.text=element_text(size = 7)) +
-  labs(x = "Residuals [mm]", y = "Observations [mm]", title = "RFsp") + coord_fixed()+
+  labs(x = "Predictions [mm]", y = "Observations [mm]", title = "RFsp") + coord_fixed()+
   xlim(0, 150) + ylim(0, 150) +
   geom_abline(slope=1, intercept=0, size = 0.1)
 
