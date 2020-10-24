@@ -1,6 +1,8 @@
 # RFSI
 
-This repository contains scripts and data used in the manuscript "Random forest spatial interpolation" by Sekulić A., Kilibarda M., Heuvelink G.B.M., Nikolić M. and Bajat B., that was submitted to the Remote Sensing journal in March 2020.
+This repository contains scripts and data used in the manuscript:
+
+Sekulić, A., Kilibarda, M., Heuvelink, G. B., Nikolić, M. & Bajat, B. Random Forest Spatial Interpolation.Remote. Sens. 12, 1687, https://doi.org/10.3390/rs12101687 (2020).
 
 ## Methodology
 

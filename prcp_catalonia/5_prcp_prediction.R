@@ -466,7 +466,7 @@ for (i in 1:4){
 }
 
 # tiff("../plot/predictions.tiff", width = 100, height = 150, units = 'mm', res = 600, compression = "lzw")
-jpeg("../plot/predictions.jpeg", width = 100, height = 150, units = 'mm', res = 600)
+jpeg("../plot/predictions.jpeg", width = 100, height = 150, units = 'mm', res = 610)
 levelplot(s, 
           margin=FALSE,                       
           colorkey=list(

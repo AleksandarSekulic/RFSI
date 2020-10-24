@@ -2636,6 +2636,25 @@ rfsp_sp <- ggplot(data, aes(x=rfsp_5f_pred, y=rfsp_5f_obs) ) +
   xlim(0, 150) + ylim(0, 150) +
   geom_abline(slope=1, intercept=0, size = 0.1)
 
+data <- as.data.frame(cbind(rfsi2_5f_obs, rfsi2_5f_pred))
+rfsi2_sp <- ggplot(data, aes(x=rfsi2_5f_pred, y=rfsi2_5f_obs) ) +
+  geom_hex(bins = 50, aes(fill = stat(cut(log(count), breaks = log(c(0, 5, 10, 50, 100, 500, 35000, Inf)), labels = F, right = T, include.lowest = T)))) +
+  scale_fill_gradientn(colours = my_colors, name = 'Count', labels = c('5', '10', '50', '100', '500', '35000', '70000+'))+
+  theme(plot.title = element_text(hjust = 0.5, face="bold"),
+        axis.text = element_text(size = 7),
+        axis.title = element_text(size = 7),
+        text = element_text(size = 7),
+        legend.position = "bottom",
+        legend.direction = "horizontal",
+        legend.key.height = unit(0.3, "cm"),
+        legend.key.width = unit(2, "cm"),
+        legend.margin = unit(0, "cm"),
+        legend.title = element_text(size = 7, face="bold"),
+        legend.text=element_text(size = 7)) +
+  labs(x = "Predictions [mm]", y = "Observations [mm]", title = expression(bold('RFSI'[0]))) + coord_fixed()+
+  xlim(0, 150) + ylim(0, 150) +
+  geom_abline(slope=1, intercept=0, size = 0.1)
+
 # # histograms
 # res_hist1 = ggplot(as.data.frame(STRK_res), aes(x=STRK_res)) +
 #   geom_histogram(binwidth=1, fill="white", color="black", alpha=1,size=0.2) +
@@ -2708,7 +2727,7 @@ rfsp_sp <- ggplot(data, aes(x=rfsp_5f_pred, y=rfsp_5f_obs) ) +
 # tiff("../plot/scatter_cv_hist_res.tiff", width = 160, height = 120, units = 'mm', res = 600)
 jpeg("../plot/scatter_cv_hist_res.jpeg", width = 160, height = 120, units = 'mm', res = 600)
 # ggarrange(
-ggarrange(strk_sp, idw_sp, rf_sp, rfsp_sp, rfsi_sp, ncol=3, nrow=2, common.legend = TRUE, legend="bottom") #,
+ggarrange(strk_sp, idw_sp, rf_sp, rfsp_sp, rfsi_sp, rfsi2_sp, ncol=3, nrow=2, common.legend = TRUE, legend="bottom") #,
           # ggarrange(res_hist1, res_hist2, res_hist3, res_hist4, ncol=4, nrow=1),
           # ncol=1, nrow=2)
 dev.off()

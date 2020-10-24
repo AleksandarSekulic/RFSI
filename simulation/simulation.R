@@ -399,7 +399,7 @@ for (nug in nugs) {
         # all_plot$RFsp <- values(rfsp_raster)
         # all_plot$IDW <- values(idw_raster)
         # all_plot$NN <- values(nn_raster)
-        # all_plot$TS2 <- values(ts2_raster)
+        # all_plot$TS <- values(ts2_raster)
         # # all_plot$fold <- sim_ok$fold
         # pts <- train
         # 

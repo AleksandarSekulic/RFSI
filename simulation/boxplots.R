@@ -14,6 +14,8 @@ accuracy_results$value <- as.numeric(as.character(accuracy_results$value))
 accuracy_results$nugget <- as.numeric(as.character(accuracy_results$nugget))
 accuracy_results$range <- as.integer(as.character(accuracy_results$range))
 accuracy_results$seed <- as.integer(as.character(accuracy_results$seed))
+levels(accuracy_results$method)[levels(accuracy_results$method) == "TS2"] <- "TS"
+levels(accuracy_results$method)
 
 # accuracy_results[accuracy_results$nugget == 2.5 &
 #                    accuracy_results$range == 50 &
@@ -72,9 +74,9 @@ for (nug in nugs) {
       geom_bar(position="dodge", stat = "identity") +
       geom_errorbar( aes(x=Npoints, ymin=mean-se, ymax=mean+se), width=0.3, colour="black", alpha=0.9, size=0.3, position=position_dodge(.9)) +
       scale_x_discrete(limits=as.character(n_pois), labels=as.character(n_pois)) +
-      scale_fill_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS2"),
+      scale_fill_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS"),
                         values=c("red", "green", "deepskyblue", "blueviolet", "chocolate1", "bisque3"))+#, "gold")) +
-      scale_color_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS2"),
+      scale_color_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS"),
                          values=c("red", "green", "deepskyblue", "blueviolet", "chocolate1", "bisque3"))+#, "gold")) +
       geom_vline(xintercept = 1.5, linetype="dashed", size=0.2) +
       geom_vline(xintercept = 2.5, linetype="dashed", size=0.2) +
@@ -131,9 +133,9 @@ for (nug in nugs) {
              geom_bar(position="dodge", stat = "identity") +
              geom_errorbar( aes(x=Npoints, ymin=mean-se, ymax=mean+se), width=0.3, colour="black", alpha=0.9, size=0.3, position=position_dodge(.9)) +
              scale_x_discrete(limits=as.character(n_pois), labels=as.character(n_pois)) +
-             scale_fill_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS2"),
+             scale_fill_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS"),
                                values=c("red", "green", "deepskyblue", "blueviolet", "chocolate1", "bisque3"))+#, "gold")) +
-             scale_color_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS2"),
+             scale_color_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS"),
                                 values=c("red", "green", "deepskyblue", "blueviolet", "chocolate1", "bisque3"))+#, "gold")) +
              geom_vline(xintercept = 1.5, linetype="dashed", size=0.2) +
              geom_vline(xintercept = 2.5, linetype="dashed", size=0.2) +
@@ -189,9 +191,9 @@ for (nug in nugs) {
              geom_bar(position="dodge", stat = "identity") +
              geom_errorbar( aes(x=Npoints, ymin=mean-se, ymax=mean+se), width=0.3, colour="black", alpha=0.9, size=0.3, position=position_dodge(.9)) +
              scale_x_discrete(limits=as.character(n_pois), labels=as.character(n_pois)) +
-             scale_fill_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS2"),
+             scale_fill_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS"),
                                values=c("red", "green", "deepskyblue", "blueviolet", "chocolate1", "bisque3"))+#, "gold")) +
-             scale_color_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS2"),
+             scale_color_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS"),
                                 values=c("red", "green", "deepskyblue", "blueviolet", "chocolate1", "bisque3"))+#, "gold")) +
              geom_vline(xintercept = 1.5, linetype="dashed", size=0.2) +
              geom_vline(xintercept = 2.5, linetype="dashed", size=0.2) +
@@ -246,9 +248,9 @@ for (nug in nugs) {
              geom_bar(position="dodge", stat = "identity") +
              geom_errorbar( aes(x=Npoints, ymin=mean-se, ymax=mean+se), width=0.3, colour="black", alpha=0.9, size=0.3, position=position_dodge(.9)) +
              scale_x_discrete(limits=as.character(n_pois), labels=as.character(n_pois)) +
-             scale_fill_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS2"),
+             scale_fill_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS"),
                                values=c("red", "green", "deepskyblue", "blueviolet", "chocolate1", "bisque3"))+#, "gold")) +
-             scale_color_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS2"),
+             scale_color_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS"),
                                 values=c("red", "green", "deepskyblue", "blueviolet", "chocolate1", "bisque3"))+#, "gold")) +
              geom_vline(xintercept = 1.5, linetype="dashed", size=0.2) +
              geom_vline(xintercept = 2.5, linetype="dashed", size=0.2) +
@@ -303,9 +305,9 @@ for (nug in nugs) {
              geom_bar(position="dodge", stat = "identity") +
              geom_errorbar( aes(x=Npoints, ymin=mean-se, ymax=mean+se), width=0.3, colour="black", alpha=0.9, size=0.3, position=position_dodge(.9)) +
              scale_x_discrete(limits=as.character(n_pois), labels=as.character(n_pois)) +
-             scale_fill_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS2"),
+             scale_fill_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS"),
                                values=c("red", "green", "deepskyblue", "blueviolet", "chocolate1", "bisque3"))+#, "gold")) +
-             scale_color_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS2"),
+             scale_color_manual(breaks = c("OK", "RFSI", "RFsp", "IDW", "NN", "TS"),
                                 values=c("red", "green", "deepskyblue", "blueviolet", "chocolate1", "bisque3"))+#, "gold")) +
              geom_vline(xintercept = 1.5, linetype="dashed", size=0.2) +
              geom_vline(xintercept = 2.5, linetype="dashed", size=0.2) +
@@ -350,7 +352,7 @@ dir.create("boxplots")
 # ggarrange(lin.0.50, lin.0.200, lin.2.5.50, lin.2.5.200, lin.5.50, lin.5.200, ncol=2, nrow=3, common.legend = TRUE, legend="right")
 # dev.off()
 
-### Fig2 ###
+### Fig4 ###
 # tiff("boxplots/mae.tiff", width = 174, height = 174, units = 'mm', res = 600, compression = "lzw")
 jpeg("boxplots/mae.jpeg", width = 174, height = 174, units = 'mm', res = 600) # res = 1200
 f1=ggarrange(mae.0.50, mae.0.200, mae.2.5.50, mae.2.5.200, mae.5.50, mae.5.200, ncol=2, nrow=3,
