@@ -6,13 +6,13 @@ Sekulić, A., Kilibarda, M., Heuvelink, G. B., Nikolić, M. & Bajat, B. Random F
 
 ## Methodology
 
-**Random Forest Spatial Interpolation (RFSI)** is a novel methodology for spatial interpolation using machine learning, i.e. random forest (RF). The main novelty is that it uses observations at n nearest locations and distances from these locations to the prediction location as spatial covariates to improve accuracy of RF.
+**Random Forest Spatial Interpolation (RFSI)** is a novel methodology for spatial interpolation using machine learning, i.e. random forest (RF) (Breiman 2001). The main novelty is that it uses observations at n nearest locations and distances from these locations to the prediction location as spatial covariates to improve accuracy of RF.
 
 ## Case studies
 
 ### Synthetic case study
 
-For this case study, multiple realisations of a spatially autocorrelated random field are simulated using a known semivariogram. The performance of RFSi is compared with the performance of ordinary kriging (OK), RFsp (Hengl et al. 2018), Inverse distance Weighting (IDW), nearest neighbour (NN), and trend surface (TS). 
+For this case study, multiple realisations of a spatially autocorrelated random field are simulated using a known semivariogram. The performance of RFSI is compared with the performance of ordinary kriging (OK), RFsp (Hengl et al. 2018), Inverse distance Weighting (IDW), nearest neighbour (NN), and trend surface (TS). 
 
 The scripts and data for the synthetic case study are in the [simulation](simulation/) folder, and are the following:
 - [accuracy_results.rda](simulation/accuracy_results.rda) - R data frame with accuracy metrics from evaluation,
@@ -59,6 +59,8 @@ The scripts and data for the precipitation case study are in the [temp_croatia](
 TODO
 
 ## References
+
+Breiman, L. (2001). Random Forests. Machine Learning, 45(1), 5–32. https://doi.org/10.1023/A:1010933404324
 
 Hengl, T., Nussbaum, M., Wright, M. N., Heuvelink, G. B. M., & Gräler, B. (2018). Random forest as a generic framework for predictive modeling of spatial and spatio-temporal variables. PeerJ, 6, e5518. https://doi.org/10.7717/peerj.5518
 
