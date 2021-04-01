@@ -7,6 +7,7 @@ Sekulić, A., Kilibarda, M., Heuvelink, G. B., Nikolić, M. & Bajat, B. Random F
 ## Methodology
 
 **Random Forest Spatial Interpolation (RFSI)** is a novel methodology for spatial interpolation using machine learning, i.e. random forest (RF) (Breiman 2001). The main novelty is that it uses observations at n nearest locations and distances from these locations to the prediction location as spatial covariates to improve accuracy of RF.
+***Note that Out-of-bag (OOB) error statistics from RFSI model are biased and should not be considered as accuracy metrics (they do not show spatial accuracy)! The proper way to assess accuaracy of the RFSI model is by using the nested k-fold cross-validation (`cv.rfsi` function of the R package [meteo](https://github.com/AleksandarSekulic/Rmeteo), Sekulić et al. 2020b).***
 
 ## Case studies
 
@@ -56,7 +57,7 @@ The scripts and data for the precipitation case study are in the [temp_croatia](
 
 ## How to make an RFSI model
 
-Complete RFSI examples (including tune.rfsi and cv.rfsi) can be found in the R package [meteo](https://github.com/AleksandarSekulic/Rmeteo), in the [demo](https://github.com/AleksandarSekulic/Rmeteo/demo) folder.
+Complete RFSI examples (including tune.rfsi and cv.rfsi) can be found in the R package [meteo](https://github.com/AleksandarSekulic/Rmeteo), in the [demo](https://github.com/AleksandarSekulic/Rmeteo/tree/master/demo) folder.
 ```
 library(meteo)
 library(sp)
@@ -81,8 +82,8 @@ rfsi_model <- rfsi(formula = fm.RFSI,
                    data = meuse,
                    zero.tol = 0,
                    n.obs = 5, # number of nearest observations
-                   s.crs = NA, # or meuse@proj4string # nedded only if the coordinates are lon/lat (WGS84)
-                   t.crs = NA, # or meuse@proj4string # nedded only if the coordinates are lon/lat (WGS84)
+                   s.crs = NA, # or meuse@proj4string # nedded only if in lon/lat (WGS84)
+                   t.crs = NA, # or meuse@proj4string # nedded only if in lon/lat (WGS84)
                    cpus = detectCores()-1,
                    progress = TRUE,
                    # ranger parameters
