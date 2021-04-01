@@ -56,7 +56,70 @@ The scripts and data for the precipitation case study are in the [temp_croatia](
 
 ## How to make an RFSI model
 
-TODO
+Complete RFSI examples (including tune.rfsi and cv.rfsi) can be found in the R package [meteo](https://github.com/AleksandarSekulic/Rmeteo), in the [demo](https://github.com/AleksandarSekulic/Rmeteo/demo) folder.
+```
+library(meteo)
+library(sp)
+library(spacetime)
+library(gstat)
+library(plyr)
+library(xts)
+library(snowfall)
+library(doParallel)
+library(CAST)
+library(ranger)
+
+# preparing data
+demo(meuse, echo=FALSE)
+meuse <- meuse[complete.cases(meuse@data),]
+
+#################### rfsi ####################
+
+fm.RFSI <- as.formula("zinc ~ dist + soil + ffreq")
+
+rfsi_model <- rfsi(formula = fm.RFSI,
+                   data = meuse,
+                   zero.tol = 0,
+                   n.obs = 5, # number of nearest observations
+                   s.crs = NA, # or meuse@proj4string # nedded only if the coordinates are lon/lat (WGS84)
+                   t.crs = NA, # or meuse@proj4string # nedded only if the coordinates are lon/lat (WGS84)
+                   cpus = detectCores()-1,
+                   progress = TRUE,
+                   # ranger parameters
+                   importance = "impurity",
+                   seed = 42,
+                   num.trees = 250,
+                   mtry = 5,
+                   splitrule = "variance",
+                   min.node.size = 5,
+                   sample.fraction = 0.95,
+                   quantreg = FALSE)
+rfsi_model
+
+# Note that OOB error statistics are biased and should not be considered as accuracy metrics
+# (they do not show spatial accuracy)!
+# The proper way to assess accuaracy of the RFSI model is by using the nested k-fold
+# cross-validation (cv.rfsi function)
+
+sort(rfsi_model$variable.importance)
+
+#################### pred.rfsi ####################
+
+rfsi_prediction <- pred.rfsi(model = rfsi_model,
+                             data = meuse, # meuse.df (use data.staid.x.y.time)
+                             zcol = "zinc",
+                             newdata = meuse.grid, # meuse.grid.df (use newdata.staid.x.y.time)
+                             output.format = "SpatialPixelsDataFrame",
+                             zero.tol = 0,
+                             s.crs = meuse@proj4string, # NA
+                             newdata.s.crs = meuse@proj4string, # NA
+                             t.crs = meuse@proj4string, # NA
+                             cpus = detectCores()-1,
+                             progress = TRUE
+)
+
+spplot(rfsi_prediction['pred'])
+```
 
 ## References
 
