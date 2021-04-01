@@ -7,6 +7,7 @@ Sekulić, A., Kilibarda, M., Heuvelink, G. B., Nikolić, M. & Bajat, B. Random F
 ## Methodology
 
 **Random Forest Spatial Interpolation (RFSI)** is a novel methodology for spatial interpolation using machine learning, i.e. random forest (RF) (Breiman 2001). The main novelty is that it uses observations at n nearest locations and distances from these locations to the prediction location as spatial covariates to improve accuracy of RF.
+
 ***Note that Out-of-bag (OOB) error statistics from RFSI model are biased and should not be considered as accuracy metrics (they do not show spatial accuracy)! The proper way to assess accuaracy of the RFSI model is by using the nested k-fold cross-validation (`cv.rfsi` function of the R package [meteo](https://github.com/AleksandarSekulic/Rmeteo), Sekulić et al. 2020b).***
 
 ## Case studies
