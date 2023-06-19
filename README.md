@@ -64,7 +64,9 @@ Complete RFSI examples (including tune.rfsi and cv.rfsi) can be found in the R p
 ```
 library(meteo)
 library(sp)
-library(spacetime)
+library(sf)
+library(sftime)
+library(terra)
 library(gstat)
 library(plyr)
 library(xts)
@@ -79,14 +81,22 @@ meuse <- meuse[complete.cases(meuse@data),]
 
 #################### rfsi ####################
 
+# fm.RFSI <- as.formula("om ~ dist + soil") # covariates without spatial covariates (obs1, dist1, ...)
 fm.RFSI <- as.formula("zinc ~ dist + soil + ffreq")
+data = st_as_sf(meuse, coords = c("x", "y"), crs = 28992, agr = "constant")
+# data = terra::vect(meuse)
+# data <- as.data.frame(meuse)
+# data$id = 1:nrow(data)
+# data.staid.x.y.z <- c("id","x","y",NA)
+class(data)
 
 rfsi_model <- rfsi(formula = fm.RFSI,
-                   data = meuse,
+                   data = data,
+                   # data.staid.x.y.z = data.staid.x.y.z, # only if class(data) == data.frame
                    zero.tol = 0,
                    n.obs = 5, # number of nearest observations
-                   s.crs = NA, # or meuse@proj4string # nedded only if in lon/lat (WGS84)
-                   t.crs = NA, # or meuse@proj4string # nedded only if in lon/lat (WGS84)
+                   # s.crs = st_crs(data), # nedded only if the coordinates are lon/lat (WGS84)
+                   # p.crs = st_crs(data), # nedded only if the coordinates are lon/lat (WGS84)
                    cpus = detectCores()-1,
                    progress = TRUE,
                    # ranger parameters
@@ -97,32 +107,50 @@ rfsi_model <- rfsi(formula = fm.RFSI,
                    splitrule = "variance",
                    min.node.size = 5,
                    sample.fraction = 0.95,
-                   quantreg = FALSE)
+                   quantreg = FALSE) # quantile regression model
+
 rfsi_model
-
-# Note that OOB error statistics are biased and should not be considered as accuracy metrics
-# (they do not show spatial accuracy)!
-# The proper way to assess accuaracy of the RFSI model is by using the nested k-fold
-# cross-validation (cv.rfsi function)
-
+# OOB prediction error (MSE):       47758.14 
+# R squared (OOB):                  0.6435869 
+# Note that OOB error statistics are biased and should not be considered as accuracy metrics (they do not show spatial accuracy)!
+# The proper way to assess accuaracy of the RFSI model is by using the nested k-fold cross-validation (cv.rfsi function)
 sort(rfsi_model$variable.importance)
 
 #################### pred.rfsi ####################
 
+# newdata <- as.data.frame(meuse.grid)
+# newdata$id <- 1:nrow(newdata)
+# newdata <- terra::vect(meuse.grid)
+newdata <- terra::rast(meuse.grid)
+class(newdata)
+
 rfsi_prediction <- pred.rfsi(model = rfsi_model,
-                             data = meuse, # meuse.df (use data.staid.x.y.time)
-                             zcol = "zinc",
-                             newdata = meuse.grid, # meuse.grid.df (use newdata.staid.x.y.time)
-                             output.format = "SpatialPixelsDataFrame",
+                             data = data,
+                             obs.col = "zinc",
+                             # data.staid.x.y.z = data.staid.x.y.z, # only if class(data) == data.frame
+                             newdata = newdata, # meuse.grid.df (use newdata.staid.x.y.z)
+                             # newdata.staid.x.y.z = c("id", "x", "y", NA), # only if class(newdata) == data.frame
+                             output.format = "SpatRaster", # "sf", # "SpatVector", 
                              zero.tol = 0,
-                             s.crs = meuse@proj4string, # NA
-                             newdata.s.crs = meuse@proj4string, # NA
-                             t.crs = meuse@proj4string, # NA
-                             cpus = detectCores()-1,
-                             progress = TRUE
+                             # s.crs = st_crs(data), # NA
+                             # newdata.s.crs = st_crs(data), # NA
+                             # p.crs = st_crs(data), # NA
+                             cpus = 1, # detectCores()-1,
+                             progress = TRUE,
+                             soil3d=FALSE
+                             # type = "quantiles",
+                             # quantiles = c(0.1, 0.5, 0.9)
 )
 
-spplot(rfsi_prediction['pred'])
+class(rfsi_prediction)
+names(rfsi_prediction)
+summary(rfsi_prediction)
+
+plot(rfsi_prediction)
+# plot(rfsi_prediction['pred'])
+# plot(rfsi_prediction['quantile..0.1'])
+# plot(rfsi_prediction['quantile..0.5'])
+# plot(rfsi_prediction['quantile..0.9'])
 ```
 
 ## References
